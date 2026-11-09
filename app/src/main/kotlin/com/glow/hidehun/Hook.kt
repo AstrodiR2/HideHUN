@@ -85,6 +85,7 @@ class Hook : IXposedHookLoadPackage {
                         })
                         hooked++
                     }
+Unit
                 }.onFailure { XposedBridge.log("HideHUN: hook ${m.name} failed: $it") }
             }
         }
