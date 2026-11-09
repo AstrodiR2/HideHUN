@@ -14,9 +14,18 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.7
+      - name: Install Gradle
+        run: |
+          ok=0
+          for u in \
+            https://services.gradle.org/distributions/gradle-8.7-bin.zip \
+            https://downloads.gradle.org/distributions/gradle-8.7-bin.zip \
+            https://mirrors.cloud.tencent.com/gradle/gradle-8.7-bin.zip; do
+            if curl -fsSL --retry 6 --retry-all-errors --retry-delay 5 -o g.zip "$u"; then ok=1; break; fi
+          done
+          [ "$ok" = 1 ] || { echo "no gradle mirror worked"; exit 1; }
+          unzip -q g.zip -d "$HOME/gradle-dist"
+          echo "$HOME/gradle-dist/gradle-8.7/bin" >> "$GITHUB_PATH"
       - run: gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
