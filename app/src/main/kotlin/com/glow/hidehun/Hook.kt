@@ -60,7 +60,7 @@ class Hook : IXposedHookLoadPackage {
                     if (m.name == "shouldHeadsUp" && m.returnType == java.lang.Boolean.TYPE) {
                         XposedBridge.hookMethod(m, XC_MethodReplacement.returnConstant(false))
                         hooked++
-                    } else if (n.contains("HeadsUpManager") && m.name == "showNotification") {
+                    } else if (n.contains("HeadsUpManager") && (m.name == "showNotification" || m.name == "onEntryAdded")) {
                         val repl = when (m.returnType) {
                             Void.TYPE -> XC_MethodReplacement.DO_NOTHING
                             java.lang.Boolean.TYPE -> XC_MethodReplacement.returnConstant(false)
@@ -74,6 +74,7 @@ class Hook : IXposedHookLoadPackage {
                         XposedBridge.hookMethod(m, object : XC_MethodHook() {
                             override fun afterHookedMethod(param: MethodHookParam) {
                                 val r = param.result ?: return
+XposedBridge.log("HideHUN: decision " + r.javaClass.name + " ctors=" + r.javaClass.declaredConstructors.joinToString("|") { c -> c.parameterTypes.joinToString(",") { t -> t.simpleName } })
                                 val c = r.javaClass.declaredConstructors.firstOrNull {
                                     it.parameterTypes.size == 2 &&
                                         it.parameterTypes[0] == java.lang.Boolean.TYPE &&
